@@ -20,8 +20,8 @@ jobs:
 
       - name: Verificar existencia de archivos necesarios
         run: |
-          if [ ! -f home.html ]; then
-            echo "Falta home.html"
+          if [ ! -f index.html ]; then
+            echo "Falta index.html"
             exit 1
           fi
           if [ ! -f styles.css ]; then
