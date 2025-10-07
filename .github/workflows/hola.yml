@@ -1,0 +1,32 @@
+name: CI/CD Taller
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Verificar existencia de archivos
+        run: |
+          if [ ! -f home.html ]; then
+            echo "Falta home.html"
+            exit 1
+          fi
+          if [ ! -f styles.css ]; then
+            echo "Falta styles.css"
+            exit 1
+          fi
+          echo " Archivos verificados correctamente"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Simular despliegue
+        run: echo "Artefactos listos para el despliegue en el entorno de Staging"
