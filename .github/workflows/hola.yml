@@ -1,18 +1,24 @@
-name: CI/CD Taller
+name: CI/CD taller
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  build-and-test:
+  # Job 1: Verificar código (Build & Test)
+  verificar_codigo:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Verificar existencia de archivos
+      - name: Verificar existencia de archivos necesarios
         run: |
           if [ ! -f home.html ]; then
             echo "Falta home.html"
@@ -22,11 +28,29 @@ jobs:
             echo "Falta styles.css"
             exit 1
           fi
-          echo " Archivos verificados correctamente"
+          echo "Archivos verificados correctamente"
 
-  deploy:
+  # Job 2: Despliegue automático en GitHub Pages
+  desplegar_pagina:
+    needs: verificar_codigo
+    if: github.ref == 'refs/heads/main' # Solo se ejecuta si es la rama principal
     runs-on: ubuntu-latest
-    needs: build-and-test
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Simular despliegue
-        run: echo "Artefactos listos para el despliegue en el entorno de Staging"
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir Archivos de Despliegue
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './' # Carpeta donde está home.html y styles.css
+
+      - name: Iniciar Despliegue a Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
